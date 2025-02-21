@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mongo5a25/models/group_model.dart';
 import 'package:mongo5a25/services/mongo_service.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 
 class GroupsScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchPhones();
+    _fetchGroups();
   }
 
   @override
@@ -41,27 +42,31 @@ class _GroupsScreenState extends State<GroupsScreen> {
     );
   }
 
-  void _fetchPhones() async {
+  void _fetchGroups() async {
     groups = await MongoService().getGroups();
     print('En fetch: $groups');
     setState(() {});
   }
 
+  void _deleteGroup(mongo.ObjectId id) async {
+    await MongoService().deleteGroup(id);
+    _fetchGroups();
+  }
 
   ListTile oneTile(GroupModel group) {
     return ListTile(
       title: Text(group.name),
       subtitle: Text(group.type),
-      trailing: const  Row(
+      trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
+          const IconButton(
             onPressed: null,
             icon:  Icon(Icons.edit),
           ),
           IconButton(
-            onPressed: null,
-            icon:  Icon(Icons.delete),
+            onPressed: () => _deleteGroup(group.id),
+            icon:  const Icon(Icons.delete),
           ),
         ],
       ),
